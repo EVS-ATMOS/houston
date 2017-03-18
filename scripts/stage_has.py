@@ -68,7 +68,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 4:
         invdir = sys.argv[3]
 
-    fetch_has(has, odir, inv_dir=None, loud = False):
+    fetch_has(has, odir, inv_dir=None, loud = False)
 
 
 
