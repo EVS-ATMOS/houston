@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -l nodes=5:ppn=16
+#PBS -l walltime=0:30:00
+#PBS -j oe
+#PBS -V
+#PBS -N IPythonMPI0
+
+echo "number of nodes"
+export PBS_NUM_NODES=`wc -l ${PBS_NODEFILE} | cut -f1 -d" "`
+echo $PBS_NUM_NODES
+echo "===================="
+echo "ssh into each node"
+cd /home/rjackson/houston/code
+
+#====================================================================
+scheduler_node=$(head -1 $PBS_NODEFILE)
+hostIndex=0
+for host in `uniq $PBS_NODEFILE`; do
+    echo "Working on $host ...."
+    if [ "$hostIndex" = "0" ]; then
+        echo "run dscheduler"
+        ssh $host ./start_scheduler.sh & 
+        sleep 4
+    else
+        echo "run dworker"
+        ssh $host ./start_worker.sh $scheduler_node &
+        sleep 1
+    fi
+    hostIndex="1"
+done
+
+echo "====-get to work-===="
+
+ssh $scheduler_node
+
+python calculate_scp.py 201608
+
+
